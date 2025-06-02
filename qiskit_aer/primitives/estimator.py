@@ -225,16 +225,17 @@ class Estimator(BaseEstimatorV1):
         circuits: Sequence[QuantumCircuit],
         observables: Sequence[BaseOperator],
         parameter_values: Sequence[Sequence[float]],
+        anti_hermitian: bool = False,
         **run_options,
     ) -> PrimitiveJob:
         circuit_indices: list = []
         for circuit in circuits:
-            index = self._circuit_ids.get(_circuit_key(circuit))
+            index = self._circuit_ids.get(_circuit_key(circuit, anti_hermitian=anti_hermitian))
             if index is not None:
                 circuit_indices.append(index)
             else:
                 circuit_indices.append(len(self._circuits))
-                self._circuit_ids[_circuit_key(circuit)] = len(self._circuits)
+                self._circuit_ids[_circuit_key(circuit, anti_hermitian=anti_hermitian)] = len(self._circuits)
                 self._circuits.append(circuit)
                 self._parameters.append(circuit.parameters)
         observable_indices: list = []
@@ -541,6 +542,8 @@ class Estimator(BaseEstimatorV1):
                     coeff = coeffs[int(term_ind)]
                     combined_expval += expval * coeff
                     combined_var += var * coeff**2
+                combined_expval = np.real_if_close(combined_expval)
+                combined_var = np.real_if_close(combined_var)
                 # Sampling from normal distribution
                 standard_error = np.sqrt(combined_var / shots)
                 expectation_values.append(rng.normal(combined_expval, standard_error))

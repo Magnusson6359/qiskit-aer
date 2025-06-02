@@ -63,8 +63,8 @@ class SaveExpectationValue(SaveAverageData):
             operator = SparsePauliOp(operator)
         elif not isinstance(operator, SparsePauliOp):
             operator = SparsePauliOp.from_operator(Operator(operator))
-        if not allclose(operator.coeffs.imag, 0):
-            raise ValueError("Input operator is not Hermitian.")
+        #if not allclose(operator.coeffs.imag, 0):
+        #    raise ValueError("Input operator is not Hermitian.")
         params = _expval_params(operator, variance=False)
         super().__init__(
             "save_expval",
@@ -122,8 +122,8 @@ class SaveExpectationValueVariance(SaveAverageData):
             operator = SparsePauliOp(operator)
         elif not isinstance(operator, SparsePauliOp):
             operator = SparsePauliOp.from_operator(Operator(operator))
-        if not allclose(operator.coeffs.imag, 0):
-            raise ValueError("Input operator is not Hermitian.")
+        #if not allclose(operator.coeffs.imag, 0):
+        #    raise ValueError("Input operator is not Hermitian.")
         params = _expval_params(operator, variance=True)
         super().__init__(
             "save_expval_var",
