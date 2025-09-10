@@ -108,7 +108,7 @@ def _format_params(param):
     return param
 
 
-def _circuit_key(circuit: QuantumCircuit, functional: bool = True) -> tuple:
+def _circuit_key(circuit: QuantumCircuit, functional: bool = True, anti_hermitian: bool = False) -> tuple:
     """Private key function for QuantumCircuit.
 
     This is the workaround until :meth:`QuantumCircuit.__hash__` will be introduced.
@@ -117,6 +117,7 @@ def _circuit_key(circuit: QuantumCircuit, functional: bool = True) -> tuple:
     Args:
         circuit: Input quantum circuit.
         functional: If True, the returned key only includes functional data (i.e. execution related).
+        anti_hermitian: Boolean to distinguish between normal and anti-hermitian circuits.
 
     Returns:
         Composite key for circuit.
@@ -136,6 +137,7 @@ def _circuit_key(circuit: QuantumCircuit, functional: bool = True) -> tuple:
         ),
         None if circuit._op_start_times is None else tuple(circuit._op_start_times),
     )
+    functional_key = functional_key + (anti_hermitian,) # To avoid hash clash with anti_hermitian. Will be removed when hash is implemented
     if functional:
         return functional_key
     return (
